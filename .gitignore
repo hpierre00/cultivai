@@ -1,0 +1,26 @@
+# Environment — never commit secrets
+.env
+
+# Generated outputs — large, ephemeral, gitignored per spec
+reports/
+snapshots/
+outcomes/
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Jest coverage
+coverage/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo

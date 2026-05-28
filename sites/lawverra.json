@@ -1,0 +1,28 @@
+{
+  "name": "lawverra",
+  "displayName": "Lawverra",
+  "url": "https://lawverra.com",
+  "github_repo": "hpierre00/hpierre00-lawverra-",
+  "github_branch": "main",
+  "netlify_site_id": "",
+  "gsc_property": "sc-domain:lawverra.com",
+  "brand_voice": "Authoritative, trustworthy, accessible legal technology. Plain English. Compliance-forward.",
+  "primary_keywords": [
+    "legal document automation",
+    "AI legal assistant",
+    "contract review software",
+    "legal tech platform"
+  ],
+  "competitors": [
+    "clio.com",
+    "contractpodai.com",
+    "ironclad.com"
+  ],
+  "ad_accounts": {
+    "google_ads_customer_id": "",
+    "meta_ad_account_id": "",
+    "bing_account_id": ""
+  },
+  "improvement_limits": {
+    "max_per_run": 5,
+    "min_confidence":

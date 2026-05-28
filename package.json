@@ -1,0 +1,37 @@
+{
+  "name": "cultivai",
+  "version": "0.1.0",
+  "description": "Self-improving websites driven by data agents",
+  "main": "run.js",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "node run.js",
+    "test": "jest --coverage",
+    "test:watch": "jest --watch"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.20.0",
+    "@googleapis/searchconsole": "^3.0.0",
+    "@octokit/rest": "^20.0.0",
+    "dotenv": "^16.0.0",
+    "googleapis": "^172.0.0",
+    "node-fetch": "^3.3.0"
+  },
+  "devDependencies": {
+    "jest": "^29.0.0",
+    "nock": "^13.0.0"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "coverageThreshold": {
+      "global": {
+        "lines": 30
+      }
+    },
+    "collectCoverageFrom": [
+      "agents/**/*.js"
+    ],
+    "testMatch": [
+      "**/te

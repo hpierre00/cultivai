@@ -1,0 +1,30 @@
+{
+  "name": "tradolux",
+  "displayName": "Tradolux",
+  "url": "https://tradolux.com",
+  "github_repo": "hpierre00/apex-trading",
+  "github_branch": "main",
+  "netlify_site_id": "08a2cce6-5840-46a6-a1da-cab33b69e71b",
+  "gsc_property": "https://tradolux.com/",
+  "brand_voice": "Professional, precise, institutional tone. Probabilistic language. Never hype.",
+  "primary_keywords": [
+    "AI trading terminal",
+    "stock scenario analysis",
+    "trading signals AI",
+    "instant stock analysis"
+  ],
+  "competitors": [
+    "tradingview.com",
+    "trade-ideas.com",
+    "benzinga.com"
+  ],
+  "ad_accounts": {
+    "google_ads_customer_id": "",
+    "meta_ad_account_id": "",
+    "bing_account_id": ""
+  },
+  "improvement_limits": {
+    "max_per_run": 5,
+    "min_confidence": 0.7
+  },
+  
