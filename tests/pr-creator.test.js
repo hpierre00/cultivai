@@ -2,7 +2,7 @@
 
 const { buildPrBody, applyImprovement, shortHash } = require('../agents/pr-creator');
 
-// ── Fixtures ──────────────────────────────────────────────────────────────────
+// Fixtures
 
 const SITE_CONFIG = {
   name:          'tradolux',
@@ -34,28 +34,28 @@ const IMPROVEMENTS = [
   },
 ];
 
-// ── shortHash ─────────────────────────────────────────────────────────────────
+// shortHash
 
 describe('shortHash', function() {
   it('returns a 7-character hex string', function() {
-    const h = shortHash('tradolux-2025-01-01-5');
+    var h = shortHash('tradolux-2025-01-01-5');
     expect(h).toMatch(/^[0-9a-f]{7}$/);
   });
 
   it('is deterministic for the same input', function() {
-    const a = shortHash('test-input');
-    const b = shortHash('test-input');
+    var a = shortHash('test-input');
+    var b = shortHash('test-input');
     expect(a).toBe(b);
   });
 
   it('differs for different inputs', function() {
-    const a = shortHash('input-a');
-    const b = shortHash('input-b');
+    var a = shortHash('input-a');
+    var b = shortHash('input-b');
     expect(a).not.toBe(b);
   });
 });
 
-// ── buildPrBody ───────────────────────────────────────────────────────────────
+// buildPrBody
 
 describe('buildPrBody', function() {
   var body;
@@ -114,57 +114,55 @@ describe('buildPrBody', function() {
   });
 
   it('handles singular count correctly', function() {
-    const singleBody = buildPrBody([IMPROVEMENTS[0]], SITE_CONFIG, '2025-06-01');
+    var singleBody = buildPrBody([IMPROVEMENTS[0]], SITE_CONFIG, '2025-06-01');
     expect(singleBody).toContain('1 change');
     expect(singleBody).not.toContain('1 changes');
   });
 });
 
-// ── applyImprovement ──────────────────────────────────────────────────────────
+// applyImprovement
 
 describe('applyImprovement', function() {
   it('replaces current text with proposed text', function() {
-    const content = '<h1>Trading for everyone.</h1>';
-    const imp     = { ...IMPROVEMENTS[0], current: 'Trading for everyone.', proposed: 'Pro Trading Signals.' };
-    const result  = applyImprovement(content, imp);
+    var content = '<h1>Trading for everyone.</h1>';
+    var imp     = { type: 'heading', file: 'x.astro', selector: 'h1', current: 'Trading for everyone.', proposed: 'Pro Trading Signals.', confidence: 0.88, source_findings: [] };
+    var result  = applyImprovement(content, imp);
     expect(result).toContain('Pro Trading Signals.');
     expect(result).not.toContain('Trading for everyone.');
   });
 
   it('replaces only the first occurrence', function() {
-    const content = 'foo foo foo';
-    const imp     = { current: 'foo', proposed: 'bar', selector: 'p' };
-    const result  = applyImprovement(content, imp);
-    // String.replace only replaces first match without /g flag
+    var content = 'foo foo foo';
+    var imp     = { current: 'foo', proposed: 'bar', selector: 'p' };
+    var result  = applyImprovement(content, imp);
     expect(result).toBe('bar foo foo');
   });
 
-  it('inserts a comment when current text is not found', function() {
-    const content = '<h1>Something else entirely</h1>';
-    const imp     = { current: 'Trading for everyone.', proposed: 'New copy', selector: 'h1' };
-    const result  = applyImprovement(content, imp);
-    expect(result).toContain('[Cultivai]');
-    expect(result).toContain('Could not auto-apply');
-    expect(result).toContain('<h1>Something else entirely</h1>');
+  it('returns original content unchanged when current text is not found', function() {
+    var content = '<h1>Something else entirely</h1>';
+    var imp     = { current: 'Trading for everyone.', proposed: 'New copy', selector: 'h1' };
+    var result  = applyImprovement(content, imp);
+    expect(result).toBe(content);
+    expect(result).not.toContain('[Cultivai]');
   });
 
   it('returns original content unchanged when both current and proposed are missing', function() {
-    const content = '<p>unchanged</p>';
-    const imp     = { selector: 'p' }; // no current or proposed
-    const result  = applyImprovement(content, imp);
+    var content = '<p>unchanged</p>';
+    var imp     = { selector: 'p' };
+    var result  = applyImprovement(content, imp);
     expect(result).toBe(content);
   });
 
   it('handles multiline file content correctly', function() {
-    const content = [
+    var content = [
       '---',
       'title: Home',
       '---',
       '<meta name="description" content="Trading for everyone." />',
       '<h1>Welcome</h1>',
     ].join('\n');
-    const imp = { current: 'Trading for everyone.', proposed: 'Pro-grade trading signals.', selector: 'meta' };
-    const result = applyImprovement(content, imp);
+    var imp = { current: 'Trading for everyone.', proposed: 'Pro-grade trading signals.', selector: 'meta' };
+    var result = applyImprovement(content, imp);
     expect(result).toContain('Pro-grade trading signals.');
     expect(result).toContain('<h1>Welcome</h1>');
   });
