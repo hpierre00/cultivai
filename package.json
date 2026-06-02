@@ -34,4 +34,7 @@
       "agents/**/*.js"
     ],
     "testMatch": [
-      "**/te
+      "**/tests/**/*.test.js"
+    ]
+  }
+}
