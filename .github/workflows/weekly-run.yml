@@ -2,7 +2,7 @@ name: Cultivai Weekly Run
 
 on:
   schedule:
-    - cron: "0 13 * * 1"→ Runs at 13:00, only on Monday   # Monday 9am ET = 13:00 UTC
+    - cron: "0 13 * * 1"   # Monday 9am ET = 13:00 UTC
   workflow_dispatch:         # manual trigger from Actions tab
 
 jobs:
@@ -31,5 +31,55 @@ jobs:
           GSC_SUBJECT_EMAIL: ${{ secrets.GSC_SUBJECT_EMAIL }}
           SERPAPI_KEY: ${{ secrets.SERPAPI_KEY }}
           FIRECRAWL_API_KEY: ${{ secrets.FIRECRAWL_API_KEY }}
+          GOOGLE_ADS_DEVELOPER_TOKEN: ${{ secrets.GOOGLE_ADS_DEVELOPER_TOKEN }}
+          GOOGLE_ADS_CLIENT_ID: ${{ secrets.GOOGLE_ADS_CLIENT_ID }}
+          GOOGLE_ADS_CLIENT_SECRET: ${{ secrets.GOOGLE_ADS_CLIENT_SECRET }}
+          GOOGLE_ADS_REFRESH_TOKEN: ${{ secrets.GOOGLE_ADS_REFRESH_TOKEN }}
+          GOOGLE_ADS_LOGIN_CUSTOMER_ID: ${{ secrets.GOOGLE_ADS_LOGIN_CUSTOMER_ID }}
+          META_ACCESS_TOKEN: ${{ secrets.META_ACCESS_TOKEN }}
+          META_APP_ID: ${{ secrets.META_APP_ID }}
+          META_APP_SECRET: ${{ secrets.META_APP_SECRET }}
+          BING_CLIENT_ID: ${{ secrets.BING_CLIENT_ID }}
+          BING_CLIENT_SECRET: ${{ secrets.BING_CLIENT_SECRET }}
+          BING_REFRESH_TOKEN: ${{ secrets.BING_REFRESH_TOKEN }}
+          BING_DEVELOPER_TOKEN: ${{ secrets.BING_DEVELOPER_TOKEN }}
 
       - name: Run Cultivai — Lawverra (organic only)
+        run: node run.js --site lawverra
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.CULTIVAI_GITHUB_TOKEN }}
+          GSC_SERVICE_ACCOUNT_JSON: ${{ secrets.GSC_SERVICE_ACCOUNT_JSON }}
+          GSC_SUBJECT_EMAIL: ${{ secrets.GSC_SUBJECT_EMAIL }}
+          SERPAPI_KEY: ${{ secrets.SERPAPI_KEY }}
+          FIRECRAWL_API_KEY: ${{ secrets.FIRECRAWL_API_KEY }}
+
+      - name: Run Cultivai — Underlytix (organic + ads)
+        run: node run.js --site underlytix --ads
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.CULTIVAI_GITHUB_TOKEN }}
+          GSC_SERVICE_ACCOUNT_JSON: ${{ secrets.GSC_SERVICE_ACCOUNT_JSON }}
+          GSC_SUBJECT_EMAIL: ${{ secrets.GSC_SUBJECT_EMAIL }}
+          SERPAPI_KEY: ${{ secrets.SERPAPI_KEY }}
+          FIRECRAWL_API_KEY: ${{ secrets.FIRECRAWL_API_KEY }}
+          GOOGLE_ADS_DEVELOPER_TOKEN: ${{ secrets.GOOGLE_ADS_DEVELOPER_TOKEN }}
+          GOOGLE_ADS_CLIENT_ID: ${{ secrets.GOOGLE_ADS_CLIENT_ID }}
+          GOOGLE_ADS_CLIENT_SECRET: ${{ secrets.GOOGLE_ADS_CLIENT_SECRET }}
+          GOOGLE_ADS_REFRESH_TOKEN: ${{ secrets.GOOGLE_ADS_REFRESH_TOKEN }}
+          GOOGLE_ADS_LOGIN_CUSTOMER_ID: ${{ secrets.GOOGLE_ADS_LOGIN_CUSTOMER_ID }}
+          META_ACCESS_TOKEN: ${{ secrets.META_ACCESS_TOKEN }}
+          META_APP_ID: ${{ secrets.META_APP_ID }}
+          META_APP_SECRET: ${{ secrets.META_APP_SECRET }}
+          BING_CLIENT_ID: ${{ secrets.BING_CLIENT_ID }}
+          BING_CLIENT_SECRET: ${{ secrets.BING_CLIENT_SECRET }}
+          BING_REFRESH_TOKEN: ${{ secrets.BING_REFRESH_TOKEN }}
+          BING_DEVELOPER_TOKEN: ${{ secrets.BING_DEVELOPER_TOKEN }}
+
+      - name: Run outcome tracker
+        run: node run.js --outcomes
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.CULTIVAI_GITHUB_TOKEN }}
+          GSC_SERVICE_ACCOUNT_JSON: ${{ secrets.GSC_SERVICE_ACCOUNT_JSON }}
+          GSC_SUBJECT_EMAIL: ${{ secrets.GSC_SUBJECT_EMAIL }}
