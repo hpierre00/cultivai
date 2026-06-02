@@ -144,4 +144,4 @@ async function run(siteConfig) {
   return report;
 }
 
-module.exp
+module.exports = { run, diffHtml, extractTags, extractPrices, extractCTAs, extractLinks };
