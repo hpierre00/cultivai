@@ -4,6 +4,12 @@
   "url": "https://lawverra.com",
   "github_repo": "hpierre00/hpierre00-lawverra-",
   "github_branch": "main",
+  "repo_pages": [
+    "src/pages/index.astro",
+    "src/components/Hero.astro",
+    "src/pages/features.astro",
+    "src/pages/solutions.astro"
+  ],
   "netlify_site_id": "",
   "gsc_property": "sc-domain:lawverra.com",
   "brand_voice": "Authoritative, trustworthy, accessible legal technology. Plain English. Compliance-forward.",
@@ -25,4 +31,6 @@
   },
   "improvement_limits": {
     "max_per_run": 5,
-    "min_confidence":
+    "min_confidence": 0.7
+  }
+}
