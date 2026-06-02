@@ -17,8 +17,6 @@ const { createHash } = require('crypto');
 
 const REPORTS_DIR = path.join(__dirname, '..', 'reports');
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
-
 function shortHash(input) {
   return createHash('sha256').update(input).digest('hex').slice(0, 7);
 }
@@ -27,11 +25,6 @@ function todayStr() {
   return new Date().toISOString().slice(0, 10);
 }
 
-/**
- * Build the PR body markdown table.
- * @param {Array} improvements
- * @returns {string}
- */
 function buildPrBody(improvements, siteConfig, date) {
   const header = [
     `## Cultivai automated improvements — ${siteConfig.displayName || siteConfig.name} (${date})`,
@@ -79,32 +72,18 @@ function buildPrBody(improvements, siteConfig, date) {
   return [...header, ...rows, ...footer].join('\n');
 }
 
-/**
- * Apply a single improvement to file content via simple text replacement.
- * Falls back to appending a comment if the current text isn't found.
- * @param {string} content  - full file content
- * @param {object} imp      - improvement object
- * @returns {string}        - updated content
- */
 function applyImprovement(content, imp) {
   if (!imp.current || !imp.proposed) return content;
-
   if (content.includes(imp.current)) {
     return content.replace(imp.current, imp.proposed);
   }
-
-  // Couldn't find exact match — insert a comment at top so the PR is still visible
-  const comment = `<!-- [Cultivai] Could not auto-apply: ${imp.selector} -- proposed: ${imp.proposed} -->`;
-  return comment + '\n' + content;
+  console.warn(`[pr-creator] applyImprovement: exact match not found for selector "${imp.selector}" — skipping`);
+  return content;
 }
-
-// ── GitHub API helpers ────────────────────────────────────────────────────────
 
 async function getOctokit() {
   const token = process.env.GITHUB_TOKEN || process.env.CULTIVAI_GITHUB_TOKEN;
   if (!token) throw new Error('Missing GITHUB_TOKEN / CULTIVAI_GITHUB_TOKEN env var');
-
-  // Lazy-require to avoid loading at module parse time during tests
   const { Octokit } = require('@octokit/rest');
   return new Octokit({ auth: token });
 }
@@ -125,8 +104,6 @@ async function getFileContent(octokit, owner, repo, filePath, ref) {
     throw err;
   }
 }
-
-// ── Main run function ─────────────────────────────────────────────────────────
 
 async function run(siteConfig, { dryRun = false } = {}) {
   const today    = todayStr();
@@ -157,27 +134,41 @@ async function run(siteConfig, { dryRun = false } = {}) {
     return { dryRun: true, branch, prTitle, improvements };
   }
 
+  const outFile = path.join(REPORTS_DIR, `${siteConfig.name}-pr-${today}.json`);
+  if (fs.existsSync(outFile)) {
+    const existing = JSON.parse(fs.readFileSync(outFile, 'utf-8'));
+    console.log(`[pr-creator] PR already created today for ${siteConfig.name}: ${existing.prUrl}`);
+    return existing;
+  }
+
   const octokit = await getOctokit();
   const { owner, repo } = parseRepo(siteConfig.github_repo);
   const baseBranch = siteConfig.github_branch || 'main';
 
-  // Get base SHA
-  const { data: baseRef } = await octokit.git.getRef({
-    owner,
-    repo,
-    ref: `heads/${baseBranch}`,
-  });
-  const baseSha = baseRef.object.sha;
+  let baseSha;
+  try {
+    const { data: baseRef } = await octokit.git.getRef({ owner, repo, ref: `heads/${baseBranch}` });
+    baseSha = baseRef.object.sha;
+    console.log(`[pr-creator] Base branch ${baseBranch} SHA: ${baseSha.slice(0, 10)}...`);
+  } catch (err) {
+    const detail = err.response?.data?.message || err.message;
+    throw new Error(`[pr-creator] Failed to get base branch ref: ${detail}`);
+  }
 
-  // Create branch
-  await octokit.git.createRef({
-    owner,
-    repo,
-    ref:  `refs/heads/${branch}`,
-    sha:  baseSha,
-  });
+  let branchAlreadyExisted = false;
+  try {
+    await octokit.git.createRef({ owner, repo, ref: `refs/heads/${branch}`, sha: baseSha });
+    console.log(`[pr-creator] Created branch: ${branch}`);
+  } catch (err) {
+    if (err.status === 422) {
+      branchAlreadyExisted = true;
+      console.log(`[pr-creator] Branch ${branch} already exists — continuing`);
+    } else {
+      const detail = err.response?.data?.message || err.message;
+      throw new Error(`[pr-creator] Failed to create branch ${branch}: ${detail}`);
+    }
+  }
 
-  // Group improvements by file to minimize API calls
   const byFile = {};
   for (const imp of improvements) {
     if (!imp.file) continue;
@@ -206,59 +197,44 @@ async function run(siteConfig, { dryRun = false } = {}) {
 
     const commitMsg = `[Cultivai] ${today}: ${fileImps.map((i) => i.type).join(', ')} in ${filePath}`;
 
-    await octokit.repos.createOrUpdateFileContents({
-      owner,
-      repo,
-      path:    filePath,
-      message: commitMsg,
-      content: Buffer.from(content).toString('base64'),
-      sha:     existing.sha,
-      branch,
-    });
-
+    try {
+      await octokit.repos.createOrUpdateFileContents({
+        owner, repo, path: filePath, message: commitMsg,
+        content: Buffer.from(content).toString('base64'),
+        sha: existing.sha, branch,
+      });
+    } catch (err) {
+      const detail = err.response?.data?.message || err.message;
+      throw new Error(`[pr-creator] Failed to commit ${filePath}: ${detail}`);
+    }
     filesEdited++;
   }
 
   if (filesEdited === 0) {
-    // Clean up the empty branch
-    try {
-      await octokit.git.deleteRef({ owner, repo, ref: `heads/${branch}` });
-    } catch {}
+    try { await octokit.git.deleteRef({ owner, repo, ref: `heads/${branch}` }); } catch {}
     console.log(`[pr-creator] No file edits applied for ${siteConfig.name} — branch deleted.`);
     return { skipped: true, reason: 'no_edits' };
   }
 
-  // Create the PR
-  const { data: pr } = await octokit.pulls.create({
-    owner,
-    repo,
-    title: prTitle,
-    body:  prBody,
-    head:  branch,
-    base:  baseBranch,
-  });
+  let pr;
+  try {
+    const { data } = await octokit.pulls.create({
+      owner, repo, title: prTitle, body: prBody, head: branch, base: baseBranch,
+    });
+    pr = data;
+  } catch (err) {
+    const detail = err.response?.data?.message || err.message;
+    throw new Error(`[pr-creator] Failed to create PR: ${detail}`);
+  }
 
   console.log(`[pr-creator] PR created: ${pr.html_url}`);
 
   const result = {
-    site:     siteConfig.name,
-    date:     today,
-    prNumber: pr.number,
-    prUrl:    pr.html_url,
-    branch,
-    filesEdited,
-    improvements: improvements.length,
+    site: siteConfig.name, date: today, prNumber: pr.number,
+    prUrl: pr.html_url, branch, filesEdited, improvements: improvements.length,
   };
-
-  const outFile = path.join(REPORTS_DIR, `${siteConfig.name}-pr-${today}.json`);
   fs.writeFileSync(outFile, JSON.stringify(result, null, 2));
-
   return result;
 }
 
-module.exports = {
-  run,
-  buildPrBody,
-  applyImprovement,
-  shortHash,
-};
+module.exports = { run, buildPrBody, applyImprovement, shortHash };
