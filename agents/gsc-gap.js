@@ -170,4 +170,8 @@ async function run(siteConfig) {
     _cached: false,
   };
   fs.mkdirSync(path.join(__dirname, '..', 'reports'), { recursive: true });
-  fs.writeFileSync(cachePath, JSON.stringify(Object.assign({}, report, { _cached: true
+  fs.writeFileSync(cachePath, JSON.stringify(Object.assign({}, report, { _cached: true }), null, 2));
+  return report;
+}
+
+module.exports = { run, detectLowCtrPages, detectPage2Opportunities, detectQueryWithoutPage };
