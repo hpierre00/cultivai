@@ -27,4 +27,27 @@
     "max_per_run": 5,
     "min_confidence": 0.7
   },
-  
+  "repo_pages": [
+    "index.html",
+    "features.html",
+    "pricing.html",
+    "about.html",
+    "market-preview.html",
+    "apex-platform.html"
+  ],
+  "site_key_elements": {
+    "index.html": {
+      "title": "Tradolux — Institutional-grade market analysis for independent traders",
+      "meta_description": "AI-powered charting, multi-factor analysis, and integrated market intelligence for serious retail traders. Not financial advice.",
+      "og_title": "Tradolux — Market analysis for independent traders",
+      "twitter_title": "Tradolux — AI Trading Terminal",
+      "twitter_description": "Five AI agents. Live signals. Institutional-grade analysis for independent traders.",
+      "h1": "Institutional-grade analysis. Built for independent traders.",
+      "lead_paragraph": "Tradolux combines real-time charting, multi-factor analytical agents, and integrated\n      AI commentary in a single terminal. See the market through five analytical lenses\n      at once, then ask your questions in plain English.",
+      "primary_cta_text": "Launch Terminal",
+      "secondary_cta_text": "View live market →",
+      "eyebrow": "AI-Powered Trading Terminal",
+      "platform_h2": "Everything you need in one terminal."
+    }
+  }
+}
