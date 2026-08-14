@@ -2,31 +2,24 @@
   "name": "underlytix",
   "displayName": "Underlytix",
   "url": "https://underlytix.com",
-  "github_repo": "hpierre00/underlytix",
+  "github_repo": "hpierre00/capiq-platform",
   "github_branch": "main",
-  "repo_pages": ["src/pages/index.astro"],
+  "repo_pages": ["index.html"],
   "netlify_site_id": "",
   "gsc_property": "https://underlytix.com/",
-  "brand_voice": "Data-driven, analytical, trusted intelligence platform.",
+  "brand_voice": "Fast, precise, and founder-focused. Underlytix removes friction from real estate deal qualification — no jargon, no paperwork, just instant answers about whether a deal funds and who will fund it.",
   "client_types": ["realtors", "investors", "lenders"],
-  "primary_keywords": {
-    "realtors": [
-      "real estate market analytics",
-      "neighborhood data platform"
-    ],
-    "investors": [
-      "real estate investment analytics",
-      "ROI analysis tool"
-    ],
-    "lenders": [
-      "mortgage market analytics",
-      "lending market intelligence"
-    ]
-  },
+  "primary_keywords": [
+    "real estate deal pre-qualification",
+    "capital readiness score",
+    "DSCR loan analyzer",
+    "fix and flip loan pre-qualification",
+    "investor client deal screening",
+    "lender matching for realtors"
+  ],
   "competitors": [
-    "corelogic.com",
-    "attomdata.com",
-    "redfin.com"
+    "dealcheck.io",
+    "dscrauthority.com"
   ],
   "ad_accounts": {
     "google_ads_customer_id": "",
